@@ -20,7 +20,7 @@ def get_latest_onscbcex_zip_url():
     # download webpage
     # parse html
     doc = requests.get(url)
-    soup = BeautifulSoup(doc.text, features="lxml")
+    soup = BeautifulSoup(doc.text)
     
     # find all the h3 elements as a list
     # take the index of the element whose text is latest version
@@ -47,7 +47,7 @@ def get_historic_onscbcex_zip_url():
     # download webpage
     # parse html
     req = requests.get(url)
-    soup = BeautifulSoup(req.text, features="lxml")
+    soup = BeautifulSoup(req.text)
     
     # create file url add_on based on html
     # add onto the base url
