@@ -1,0 +1,8 @@
+streamlit
+requests
+bs4
+pandas
+zipfile
+io
+glob
+pickle
