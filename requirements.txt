@@ -2,3 +2,4 @@ streamlit
 requests
 bs4
 pandas
+openpyxl
