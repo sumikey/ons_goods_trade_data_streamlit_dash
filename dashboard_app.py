@@ -3,22 +3,23 @@ import streamlit as st
 import ons_data_collection
 import pickle
 
-# set a start parameter with an experimental memo cacher
-@st.experimental_memo
-def start():
-    ons_data_collection.get_all_data()
-    df = pd.read_pickle('ons_df.pkl')
-    return df
-
-# initialise and set to df
-df = start()
-
-# # import our ONS data which is already saved in dataframe pkl file
-# try: 
-#     df = pd.read_pickle('ons_df.pkl')
-# except:
+## COMMENT OUT - Didn't work
+# # set a start parameter with an experimental memo cacher
+# @st.experimental_memo
+# def start():
 #     ons_data_collection.get_all_data()
 #     df = pd.read_pickle('ons_df.pkl')
+#     return df
+
+# # initialise and set to df
+# df = start()
+
+# import our ONS data which is already saved in dataframe pkl file
+try: 
+    df = pd.read_pickle('ons_df.pkl')
+except:
+    ons_data_collection.get_all_data()
+    df = pd.read_pickle('ons_df.pkl')
     
 # get our commodity list from pkl file
 open_file=open('./Data/pkl_lists/commodity_list.pkl', 'rb')
