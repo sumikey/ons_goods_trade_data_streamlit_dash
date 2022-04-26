@@ -5,7 +5,6 @@ import pandas as pd
 from zipfile import ZipFile
 from io import BytesIO
 import glob
-import streamlit as st
 
 def get_latest_onscbcex_zip_url():
     """A function to return a URL for the latest version of the ONS's Country by Commodity Exports data.
@@ -171,7 +170,6 @@ def df_to_MultiIndex_time_series(df):
     # return the altered index
     return df
 
-@st.cache(suppress_st_warning=True)
 def get_all_data():
     """Creates a dataframe with a multi-index header of UK exports to all countries.
     Based on ONS Country by commodity exports. Takes historic data and current data and combines.
@@ -197,7 +195,7 @@ def get_all_data():
     df = df_to_MultiIndex_time_series(df)
     
     # save df as a pick object so maintain multi-headers
-    df.to_pickle('./Data/Dataframe/ons_df.pkl')
+    df.to_pickle('ons_df.pkl')
     
     # print output to say completed
     print('Completed process to get all data')
