@@ -5,10 +5,10 @@ import pickle
 
 # import our ONS data which is already saved in dataframe pkl file
 try: 
-    df = pd.read_pickle('./Data/Dataframe/ons_df.pkl')
+    df = pd.read_pickle('ons_df.pkl')
 except:
     ons_data_collection.get_all_data()
-    df = pd.read_pickle('./Data/Dataframe/ons_df.pkl')
+    df = pd.read_pickle('ons_df.pkl')
     
 # get our commodity list from pkl file
 open_file=open('./Data/pkl_lists/commodity_list.pkl', 'rb')
