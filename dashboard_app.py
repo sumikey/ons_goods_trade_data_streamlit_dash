@@ -27,7 +27,7 @@ def get_test_data():
     return df
 
 # start it
-df = get_text_data()
+df = get_test_data()
     
 # get our commodity list from pkl file
 open_file=open('./Data/pkl_lists/commodity_list.pkl', 'rb')
