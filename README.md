@@ -14,7 +14,7 @@ ons_csv_test.csv a pre-downloaded csv of ons data to simplify pre-processing and
 
 **Issues / To-Do**
 
-dashboard_app.py is having issues deploying on streamlit: the files scraped fron ons are zipped excels, and the preprocessed dataframe is then saved as a .pkl. This process works locally but is causing issues in deployment. For now the dashboard is running off of the pre-downloaded ons_csv_test.csv stored on github and is not scraping new data from the ONS website. Will fix in a future iteration.
+dashboard_app.py is having issues deploying on streamlit: the files scraped from ons are zipped excels, and the preprocessed dataframe is then saved as a .pkl. This process works locally but is causing issues in deployment. For now the dashboard is running off of the pre-downloaded ons_csv_test.csv stored on github and is not scraping new data from the ONS website. Will fix in a future iteration.
 
 ---
 
