@@ -3,6 +3,7 @@ import streamlit as st
 import ons_data_collection
 import pickle
 
+# THIS CODE IS CURRENTLY UNUSED AS IT IS IMPACTING DEPLOMENT
 # # import our ONS data which is already saved in dataframe pkl file
 # try: 
 #     df = 
@@ -17,6 +18,7 @@ import pickle
 #     df = pd.read_pickle('ons_df.pkl')
 #     return df
 
+######### THIS SECTION IS BEING USED TEMPORARILY SO CAN DEPLOY 
 def get_test_data():
     # read in csv file
     df = pd.read_csv('ons_csv_test.csv')
@@ -28,7 +30,8 @@ def get_test_data():
 
 # start it
 df = get_test_data()
-    
+###########  
+  
 # get our commodity list from pkl file
 open_file=open('./Data/pkl_lists/commodity_list.pkl', 'rb')
 commodity_list = pickle.load(open_file)
@@ -54,7 +57,7 @@ This dashboard is for analysing UK goods exports to different trading partners a
 ## SETTING UP THE FIRST THREE PLOTS FOR TOTAL EXPORTS
 
 # setting up select boxes for our list of partners and trade products
-partner_select = st.selectbox('Which main trade partner do you want to analyse?', partner_list)
+partner_select = st.selectbox('Which main trade partner do you want to analyse?', partner_list, index = partner_list.index('Whole world') )
 
 # use these values to filter df for first two charts
 plot_df = (df.xs(partner_select, axis=1, level=0)
