@@ -57,9 +57,9 @@ open_file.close()
 
 st.write("""
 # UK Goods Exports  
-#### Data: [ONS: Trade in goods: country-by-commodity exports](https://www.ons.gov.uk/economy/nationalaccounts/balanceofpayments/datasets/uktradecountrybycommodityexports)   
+#### Data: [ONS: Trade in goods: country-by-commodity exports](https://www.ons.gov.uk/economy/nationalaccounts/balanceofpayments/datasets/uktradecountrybycommodityexports)
 
-The data underlying this dashboard is pulled directly from the ONS's website, it may take a while to load upon first opening the website. 
+#####The data underlying this dashboard is pulled directly from the ONS's website, it may take a while to load upon first opening the website. 
 This dashboard is for analysing UK goods exports to different trading partners around the world. 
 The first section looks at the UK's total goods exports to the selected trade partner. 
 The second section looks at UK exports to that same partner by SITC 1 digit product categories, products to be included can be turned on/off via the multi-selector.
