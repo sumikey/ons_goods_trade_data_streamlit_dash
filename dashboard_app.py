@@ -90,7 +90,8 @@ plot_df = plot_df.rolling(rol_val).sum().dropna() # edit the plotting df accordi
 # set as two separate slides for min and max
 min_year = st.sidebar.slider('Date Range - Minimum', 
                                min_value=plot_df.index.min().year, 
-                               max_value=plot_df.index.max().year
+                               max_value=plot_df.index.max().year,
+                               value=2016
                               )
 
 max_year = st.sidebar.slider('Date Range - Maximum', 
