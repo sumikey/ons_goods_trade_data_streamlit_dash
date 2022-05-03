@@ -6,6 +6,7 @@ from zipfile import ZipFile
 from io import BytesIO
 import glob
 import streamlit as st
+import pickle
 
 def get_latest_onscbcex_zip_url():
     """A function to return a URL for the latest version of the ONS's Country by Commodity Exports data.
@@ -204,7 +205,46 @@ def get_all_data():
     # empty return
     return
 
+def add_non_volatile_col(df):
+    """Adds a column of exports of Non-Volatile goods (total goods minus fuels and unspecified goods).
+    For each column in dataframe. Returns new dataframe with nv columns added on"""
+    
+    # Add a prrint statement so can see function being called.
+    print('Calculating and adding non-volatile goods exports columns')
+    
+    # get our partner list from pkl file
+    open_file=open('./Data/pkl_lists/partner_list.pkl', 'rb')
+    partner_list = pickle.load(open_file)
+    open_file.close()
+    
+    # enter for loop to cycle through all partner names
+    for partner in partner_list:
+        # create a temporary dataframe for that partner only
+        # keep only the commodity code headers
+        # remove commodity description and flow headers
+        temp_df = (
+                    df.xs(partner, axis=1, level=0)
+                      .droplevel(axis=1, level=1)
+                      .droplevel(axis=1, level=1)
+                   )
+        # create a new series of total minus '3' (Fuels) and '9' (Unspecified Goods)
+        # use astype(float) to handle some values interpreted as strings
+        series_nv = temp_df['T'] -temp_df['3'] -temp_df['9']
+        # convert this series to a dataframe, transpose it for Multi-index adding
+        df_nv = pd.DataFrame(series_nv).T
+        # set the index to a multi-index object with partner name and Non-Volatile relevant terms
+        df_nv.index = pd.MultiIndex.from_tuples([[partner, 'NV', 'Non-Volatile Goods', 'Exports']])
+        # concatenate our new nv series df onto old df2
+        # assign back to df so can pickup and add on next loop
+        df = pd.concat([df, df_nv.T], axis=1)
+    
+    # return our df with the newly added Non-Volatile columns
+    return df
+
 def get_test_data():
+    """A temporary function for loading data from our test csv dataset.
+    Then performs our fixes and shaping. Convert everything to numeric,
+    add in new columns for non-volatile goods trade"""
     
     # read in csv file
     df = pd.read_csv('ons_csv_test.csv')
@@ -213,6 +253,14 @@ def get_test_data():
     # add MultiIndex column headers and convert to time-series with datetime
     df = fix_df_columns(df)
     df = df_to_MultiIndex_time_series(df)
+    
+    # convert everything to numeric
+    df = df.apply(pd.to_numeric, errors='coerce')
+    # and fill NaNs from error coercion
+    df.fillna(0, inplace=True)
+    
+    # add our non-volatile columns onto it
+    df = add_non_volatile_col(df)
     
     return df
     
