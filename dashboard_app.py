@@ -182,13 +182,9 @@ shift = 'n increase' if plot_diff_df.iloc[-1,0] > 0 else ' decrease'
     # second line handles the type, partner and total amount
     # third line handles whether year on year increase or decrease and by how much
 if rol_val>1:
-    st.write(f"""> **Over the {rol_val} months through to {plot_abs_df.index[-1].month_name()} {plot_abs_df.index[-1].year}, 
-    UK {ttl_or_nonv_select} exports to {partner_select} reached £{round(plot_abs_df.iloc[-1,0]/1_000, 2)} billion.
-    This represents a{shift} of {round(plot_percent_df.iloc[-1,0], 1)}% (or £{round(abs(plot_diff_df.iloc[-1,0]/1_000), 2)} billion) year-on-year.**""")
+    st.write(f"""> **Over the {rol_val} months through to {plot_abs_df.index[-1].month_name()} {plot_abs_df.index[-1].year}, UK {ttl_or_nonv_select} exports to {partner_select} reached £{round(plot_abs_df.iloc[-1,0]/1_000, 2)} billion. This represents a{shift} of {round(plot_percent_df.iloc[-1,0], 1)}% (or £{round(abs(plot_diff_df.iloc[-1,0]/1_000), 2)} billion) year-on-year.**""")
 else:
-    st.write(f"""> **In {plot_abs_df.index[-1].month_name()} {plot_abs_df.index[-1].year},
-    UK {ttl_or_nonv_select} exports to {partner_select} reached £{round(plot_abs_df.iloc[-1,0]/1_000, 2)} billion.
-    This represents a{shift} of {round(plot_percent_df.iloc[-1,0], 1)}% (or £{round(abs(plot_diff_df.iloc[-1,0]/1_000), 2)} billion) year-on-year.**""")
+    st.write(f"""> **In {plot_abs_df.index[-1].month_name()} {plot_abs_df.index[-1].year}, UK {ttl_or_nonv_select} exports to {partner_select} reached £{round(plot_abs_df.iloc[-1,0]/1_000, 2)} billion. This represents a{shift} of {round(plot_percent_df.iloc[-1,0], 1)}% (or £{round(abs(plot_diff_df.iloc[-1,0]/1_000), 2)} billion) year-on-year.**""")
 
 # add an extra empty line for spacing
 st.write(' ')
@@ -222,11 +218,7 @@ with cola3:
     st.line_chart(plot_percent_df)
 
 
-st.write("""> *This section shows the UK's total (or Non-volatile goods) exports to the selected partner based on the selections made above. 
-The charts show the total value, the yoy change in £s and the yoy change in % terms.
-By default, values are set to rolling 12 month sums, but the degree of rolling can be lowered using the slider in the sidebar.
-If rolling is set equal to '1', monthly values will be shown.
-The number of years shown can also be controlled by the sliders in the sidebar.*""")
+st.write("""> *This section shows the UK's total (or Non-volatile goods) exports to the selected partner based on the selections made above. The charts show the total value, the yoy change in £s and the yoy change in % terms. By default, values are set to rolling 12 month sums, but the degree of rolling can be lowered using the slider in the sidebar. If rolling is set equal to '1', monthly values will be shown. The number of years shown can also be controlled by the sliders in the sidebar.*""")
 
 #--------------------------------------------------------------------
    
@@ -273,8 +265,6 @@ diff_text_df = plot_sitc1_diff_df.iloc[-1,:].T.sort_values(ascending=False)
 sign_strong = '+' if diff_text_df.iloc[0] > 0 else '-'
 sign_weak = '+' if diff_text_df.iloc[-1] > 0 else '-'
 
-# st.table(plot_sitc1_diff_df.iloc[-1,:].T.sort_values(ascending=False))
-
 # write two cases, one for if rolling is on or off
 # for each:
     # state the period in question and total exports over that period
@@ -283,24 +273,10 @@ sign_weak = '+' if diff_text_df.iloc[-1] > 0 else '-'
     # use our created sign_strong and sign_weak to handle text (and make values absolutes)
     
 if rol_val>1:
-    st.write(f"""> **Over the {rol_val} months through to {plot_abs_df.index[-1].month_name()} {plot_abs_df.index[-1].year}, 
-    UK {ttl_or_nonv_select} exports to {partner_select} reached £{round(plot_abs_df.iloc[-1,0]/1_000, 2)} billion.
-    Over this period, the UK's largest exports to {partner_select} were 
-    {abs_text_df.index[0]} (£{abs_text_df.iloc[0]}m),
-    {abs_text_df.index[1]} (£{abs_text_df.iloc[1]}m), and
-    {abs_text_df.index[2]} (£{abs_text_df.iloc[2]}m).
-    The strongest performing  category was {diff_text_df.index[0]} ({sign_strong}£{abs(diff_text_df.iloc[0])}m yoy),
-    and the weakest performing category was {diff_text_df.index[-1]} ({sign_weak}£{abs(diff_text_df.iloc[-1])}m yoy).**""")
+    st.write(f"""> **Over the {rol_val} months through to {plot_abs_df.index[-1].month_name()} {plot_abs_df.index[-1].year}, UK {ttl_or_nonv_select} exports to {partner_select} reached £{round(plot_abs_df.iloc[-1,0]/1_000, 2)} billion. Over this period, the UK's largest exports to {partner_select} were {abs_text_df.index[0]} (£{abs_text_df.iloc[0]}m), {abs_text_df.index[1]} (£{abs_text_df.iloc[1]}m), and {abs_text_df.index[2]} (£{abs_text_df.iloc[2]}m). The strongest performing  category was {diff_text_df.index[0]} ({sign_strong}£{abs(diff_text_df.iloc[0])}m yoy), and the weakest performing category was {diff_text_df.index[-1]} ({sign_weak}£{abs(diff_text_df.iloc[-1])}m yoy).**""")
+
 else:
-    st.write(f"""> **In {plot_abs_df.index[-1].month_name()} {plot_abs_df.index[-1].year},
-    UK {ttl_or_nonv_select} exports to {partner_select} reached £{round(plot_abs_df.iloc[-1,0]/1_000, 2)} billion.
-    In that month, the UK's largest exports to {partner_select} were 
-    {abs_text_df.index[0]} (£{abs_text_df.iloc[0]}m),
-    {abs_text_df.index[1]} (£{abs_text_df.iloc[1]}m), and
-    {abs_text_df.index[2]} (£{abs_text_df.iloc[2]}m).
-    The strongest performing  category was {diff_text_df.index[0]} ({sign_strong}£{abs(diff_text_df.iloc[0])}m yoy),
-    and the weakest performing category was {diff_text_df.index[-1]} ({sign_weak}£{abs(diff_text_df.iloc[-1])}m yoy).
-    **""")
+    st.write(f"""> **In {plot_abs_df.index[-1].month_name()} {plot_abs_df.index[-1].year}, UK {ttl_or_nonv_select} exports to {partner_select} reached £{round(plot_abs_df.iloc[-1,0]/1_000, 2)} billion. In that month, the UK's largest exports to {partner_select} were {abs_text_df.index[0]} (£{abs_text_df.iloc[0]}m), {abs_text_df.index[1]} (£{abs_text_df.iloc[1]}m), and {abs_text_df.index[2]} (£{abs_text_df.iloc[2]}m). The strongest performing  category was {diff_text_df.index[0]} ({sign_strong}£{abs(diff_text_df.iloc[0])}m yoy), and the weakest performing category was {diff_text_df.index[-1]} ({sign_weak}£{abs(diff_text_df.iloc[-1])}m yoy).**""")
 
 # setting up the multi-selector for which SITC 1 digit codes to include
 sitc1_abs_list = st.multiselect('Select SITC 1 digit categories to include in charts', sitc_1dig_names, default=sitc_1dig_names)
@@ -338,13 +314,7 @@ with colb3:
     st.line_chart(plot_sitc1_percent_df[sitc1_abs_list])           #line chart
 
 
-st.write("""> *This section shows the UK's total (or Non-volatile goods) exports to the selected partner based on the selections made, by SITC 1 digit codes.
-SITC 1 digit categories can be turned on/off using the multi-selector. 
-If analysing 'Non-Volatile' goods, Fuels (SITC '3') and Unspecified Goods (SITC '9') will not be available in the multi-selector. 
-The charts show the total value, the yoy change in £s and the yoy change in % terms.
-By default, values are set to rolling 12 month sums, but the degree of rolling can be lowered using the slider in the sidebar.
-If rolling is set equal to '1', monthly values will be shown.
-The number of years shown can also be controlled by the sliders in the sidebar.*""")
+st.write("""> *This section shows the UK's total (or Non-volatile goods) exports to the selected partner based on the selections made, by SITC 1 digit codes. SITC 1 digit categories can be turned on/off using the multi-selector. If analysing 'Non-Volatile' goods, Fuels (SITC '3') and Unspecified Goods (SITC '9') will not be available in the multi-selector. The charts show the total value, the yoy change in £s and the yoy change in % terms. By default, values are set to rolling 12 month sums, but the degree of rolling can be lowered using the slider in the sidebar. If rolling is set equal to '1', monthly values will be shown. The number of years shown can also be controlled by the sliders in the sidebar.*""")
     
 #--------------------------------------------------------------------
    
