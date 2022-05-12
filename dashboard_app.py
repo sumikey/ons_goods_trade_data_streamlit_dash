@@ -222,7 +222,7 @@ st.write("""> *This section shows the UK's total (or Non-volatile goods) exports
 
 #--------------------------------------------------------------------
    
-### SETTING UP THE FIRST THREE PLOTS FOR EXPORTS BY SITC 1-DIGIT
+### SETTING UP THE SECOND THREE PLOTS FOR EXPORTS BY SITC 1-DIGIT
     
 # create a list of codes for the SITC one-digit categories
 if ttl_or_nonv_select == 'Total':
@@ -318,16 +318,16 @@ st.write("""> *This section shows the UK's total (or Non-volatile goods) exports
     
 #--------------------------------------------------------------------
    
-### SETTING UP THE FINAL THREE PLOTS FOR COMPARING BY CHOSEN PRODUCT
+### SETTING UP THE THIRD THREE PLOTS FOR COMPARING BY CHOSEN PRODUCT
 
 # write the title and intro for section 3
 st.write(
 f"""
 ---  
-##### UK exports to selected partners, for selected product category
+##### UK exports to multiple partners, for selected product category
 This section shows the UK's exports of the selected product categoory to the range of selected partners by the total value, 
 the yoy change in £s and the yoy change in % terms. The product category and comparison partners can be set using the options. 
-Values can be set to rolling monthly sums using the slider in the page's sidebar.
+The number of months over which to roll values can be changed, or turned off entirely, within the side bar.
 """
 )
 
@@ -337,8 +337,28 @@ if partner_select != 'Whole world':
 else:
     comparitors = ['Whole world', 'Total EU(28)', 'Extra EU 28 (Rest of World)']
 
+# setup a list of codes + descriptions concatenated together from headers
+# will use this to construct a unique list
+# and then a dictionary so can use selection from this list to do the subsetting on desc header
+list_tuples_codeDesc_desc = [(header[1] +' : ' +header[2],   # tuple part one - code + description
+                              header[2])                    # tuple part 2 - description
+                             for header in df.columns]
+# use set to get the unique values, and make a list again
+list_set_tuples_codeDesc_desc = list(set(list_tuples_codeDesc_desc))
+
+# get list of codes concatentenated with descriptions for multi-selector
+# then sort it in ascending order
+codes_desc_list = [item[0] for item in list_set_tuples_codeDesc_desc]
+codes_desc_list.sort()
+
+# creating the dictionary which will use to get desc for codeDesc, to subset our headers
+dict_codeDesc_desc = {item[0]:item[1] for item in list_set_tuples_codeDesc_desc}
+
 # create a selectbox for choosing commodity to look at comparison chart for
-product_select = st.selectbox('Select a product to compare across partners', commodity_list, index= commodity_list.index('Total'))
+product_select_codeDesc = st.selectbox('Select a product to compare across partners', codes_desc_list, index= codes_desc_list.index('T : Total'))
+
+# convert this to a description only which we can use to subset headers, using our dict
+product_select = dict_codeDesc_desc[product_select_codeDesc]
 
 # setting up the trading partner multi-selector
 multipartner_select = st.multiselect('Select trade partners to include', partner_list, default=comparitors)
@@ -347,20 +367,20 @@ multipartner_select = st.multiselect('Select trade partners to include', partner
 # need to transpose once and then back again.
 # use colons (:) to pick all instances for code and flow index
 idx = pd.IndexSlice
-plot_compare_df = df.T.loc[idx[multipartner_select,:,product_select,:] ,:].T
+plot_compare_partner_df = df.T.loc[idx[multipartner_select,:,product_select,:] ,:].T
 
 # create a list of names from the comm_desc part of our multi-index
 # set this list of names as the column names
-compare_names = [x[0] for x in plot_compare_df.columns]
-plot_compare_df.columns = compare_names
+compare_partner_names = [x[0] for x in plot_compare_partner_df.columns]
+plot_compare_partner_df.columns = compare_partner_names
 
 # add the rolling factor to our plotting df
-plot_compare_df = plot_compare_df.rolling(rol_val).sum().dropna() # edit the plotting df accordingly
+plot_compare_partner_df = plot_compare_partner_df.rolling(rol_val).sum().dropna() # edit the plotting df accordingly
 
 # create three new plot dfs using this newly subsetted dataframe
-plot_compare_abs_df = plot_compare_df.round(1).loc[min_year:max_year] # for plotting absolute values
-plot_compare_diff_df = plot_compare_df.diff(12).dropna().round(1).loc[min_year:max_year] # for plotting absolute values
-plot_compare_percent_df = plot_compare_df.pct_change(12).mul(100).dropna().round(1).loc[min_year:max_year] # the % change yoy
+plot_compare_partner_abs_df = plot_compare_partner_df.round(1).loc[min_year:max_year] # for plotting absolute values
+plot_compare_partner_diff_df = plot_compare_partner_df.diff(12).dropna().round(1).loc[min_year:max_year] # for plotting absolute values
+plot_compare_partner_percent_df = plot_compare_partner_df.pct_change(12).mul(100).dropna().round(1).loc[min_year:max_year] # the % change yoy
 
 # create three separate columns
 colc1, colc2, colc3 = st.columns((1,1,1))
@@ -373,7 +393,7 @@ with colc1:
         st.write(f"UK {product_select} exports to {partner_select}, rolling {str(rol_val)}M sum, £s millions") #title
     else:
         st.write(f"UK {product_select} exports to {partner_select}, monthly, £s millions")
-    st.line_chart(plot_compare_abs_df)           #line chart
+    st.line_chart(plot_compare_partner_abs_df)           #line chart
 
 with colc2: 
     # plot a line chart of gbp yoy change
@@ -382,7 +402,7 @@ with colc2:
         st.write(f"UK {product_select} exports to {partner_select}, rolling {str(rol_val)}M sum, £s millions change yoy") #title
     else:
         st.write(f"UK {product_select} exports to {partner_select}, £s millions change yoy")
-    st.line_chart(plot_compare_diff_df)           #line chart
+    st.line_chart(plot_compare_partner_diff_df)           #line chart
 
 with colc3:
     # plot a line of monthly yoy % change
@@ -391,9 +411,105 @@ with colc3:
         st.write(f"UK {product_select} exports to {partner_select}, rolling {str(rol_val)}M sum, % change yoy") #title
     else:
         st.write(f"UK {product_select} exports to {partner_select}, monthly, % change yoy")
-    st.line_chart(plot_compare_percent_df)
+    st.line_chart(plot_compare_partner_percent_df)
 
 #--------------------------------------------------------------------
+
+### SETTING UP THE FOURTH (AND FINAL) THREE PLOTS FOR COMPARING BY CHOSEN PRODUCT
+
+# write the title and intro for section 3
+st.write(
+f"""
+---  
+##### UK exports of multiple products, for selected a selected partner
+This section shows the UK's exports of the selected trade partner for a range of different commodities by the total value, 
+the yoy change in £s and the yoy change in % terms. The product category and comparison partners can be set using the options. 
+The number of months over which to roll values can be changed, or turned off entirely, within the side bar.
+"""
+)
+
+# create a selectbox for choosing commodity to look at comparison chart for
+mulprod_partner_select = st.selectbox('Choose which partner you want to compare products', partner_list, index= partner_list.index(partner_select))
+
+# create a list of default products for our multi-select box
+default_product_multi_select = ['NV : Non-Volatile Goods', 'T : Total']
+
+# create a multi-select box using our codes+desc list
+mulprod_codesDesc_product_select = st.multiselect('Which products would you like to compare?', codes_desc_list, default=default_product_multi_select)
+
+# convert this to a description only which we can use to subset headers, using our dict
+# use a list comprehension so can take in and give out a list
+mulprod_product_select = [dict_codeDesc_desc[product] for product in mulprod_codesDesc_product_select]
+
+# index our dataframe using our selections
+# need to transpose once and then back again.
+# use colons (:) to pick all instances for code and flow index
+idx = pd.IndexSlice
+plot_compare_product_df = df.T.loc[idx[mulprod_partner_select,:,mulprod_product_select,:] ,:].T
+
+# create a list of names from the comm_desc part of our multi-index
+# set this list of names as the column names
+compare_names = [x[2] for x in plot_compare_product_df.columns]
+plot_compare_product_df.columns = compare_names
+
+# add the rolling factor to our plotting df
+plot_compare_product_df = plot_compare_product_df.rolling(rol_val).sum().dropna() # edit the plotting df accordingly
+
+# create three new plot dfs using this newly subsetted dataframe
+plot_compare_product_abs_df = plot_compare_product_df.round(1).loc[min_year:max_year] # for plotting absolute values
+plot_compare_product_diff_df = plot_compare_product_df.diff(12).dropna().round(1).loc[min_year:max_year] # for plotting absolute values
+plot_compare_product_percent_df = plot_compare_product_df.pct_change(12).mul(100).dropna().round(1).loc[min_year:max_year] # the % change yoy
+
+# create three separate columns
+colc1, colc2, colc3 = st.columns((1,1,1))
+
+# create a product string name for inserting into title
+# take the list of descriptions (without codes) add then together with an "and" for the last one
+multiprod_title_string = ''   # empty string
+multiprod_counter = 0         # setup a counter at zero
+if len(mulprod_product_select) > 1:           # if more than one selected
+    for item in mulprod_product_select[:-1]:  # for everything before last ter
+        if multiprod_counter == 0:            # for first term just equals the name
+            multiprod_title_string = item
+            multiprod_counter += 1                       
+        else:                                 # for everything else, previous name + comma + new name
+            multiprod_title_string = multiprod_title_string +', ' +item
+            multiprod_counter += 1
+    multiprod_title_string = multiprod_title_string +' and ' +mulprod_product_select[-1]   # add the final name with an and
+else:                                         # for when only one thing selected
+    multiprod_title_string = str(mulprod_product_select[0])
+
+# plot a separate chart in each column
+with colc1: 
+    # plot a line chart of monthly absolute values
+    # handle titles depending on the rolling factor
+    if rol_val > 1:
+        st.write(f"UK exports to {mulprod_partner_select} of {multiprod_title_string}, rolling {str(rol_val)}M sum, £s millions") #title
+    else:
+        st.write(f"UK exports to {mulprod_partner_select} of {multiprod_title_string}, monthly, £s millions")
+    st.line_chart(plot_compare_product_abs_df)           #line chart
+
+with colc2: 
+    # plot a line chart of gbp yoy change
+    # handle titles depending on the rolling factor
+    if rol_val > 1:
+        st.write(f"UK exports to {mulprod_partner_select} of {multiprod_title_string}, rolling {str(rol_val)}M sum, £s millions change yoy") #title
+    else:
+        st.write(f"UK exports to {mulprod_partner_select} of {multiprod_title_string}, £s millions change yoy")
+    st.line_chart(plot_compare_product_diff_df)           #line chart
+
+with colc3:
+    # plot a line of monthly yoy % change
+    # handle titles depending on the rolling factor
+    if rol_val > 1:
+        st.write(f"UK exports to {mulprod_partner_select} of {multiprod_title_string}, rolling {str(rol_val)}M sum, % change yoy") #title
+    else:
+        st.write(f"UK exports to {mulprod_partner_select} of {multiprod_title_string}, monthly, % change yoy")
+    st.line_chart(plot_compare_product_percent_df)
+
+    
+st.write('---')
+    
 #ENDS#
 
 
