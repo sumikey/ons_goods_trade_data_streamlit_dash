@@ -113,7 +113,7 @@ st.write("""
 
 #intro
 st.write("""
-##### This dashboard is for analysing UK goods exports to different trading partners around the world. The first section looks at the UK's total goods exports to the selected trade partner. The second section looks at UK exports to that same partner by SITC 1 digit product categories, products to be included can be turned on/off via the multi-selector. The third section compares UK exports of the selected partner and product to a range of other trading partners. By default all charts are on a 12 month rolling sum basis, but the degree of rolling can be set in the sidebar -- and set rolling as "1" for monthly values. Minimum and maximum date ranges for the charts can be set using the sliders in the sidebar. Side bar sliders control all the visuals at once.
+##### This dashboard is for analysing UK goods exports to different trading partners around the world. The first section looks at the UK's overall goods exports to a chosen trade partner. The second section looks at overall UK exports to that same partner by SITC 1 digit product categories. The third section compares UK exports to a chosen partner and product to a range of other trading partners. The fourth section allow comparisons of exports of several different products to a single partner. In sections 3 and 4, products can be chosen across a range of SITC 1, 2 and 3 digit codes, as published by the ONS within this dataset. By default all charts are on a 12 month rolling sum basis, but the degree of rolling can be set in the sidebar and rolling can be set as "1" to explore only monthly values. Minimum and maximum date ranges for the charts can be set using the sliders in the sidebar. Side bar sliders control all the visuals at once.
 
 ---
 """)
