@@ -86,7 +86,7 @@ open_file.close()
 ### set page config must be called as first streamlit command
 
 # setting the page to open in wide mode
-st.set_page_config(layout="wide")
+st.set_page_config(page_title = "UK Goods Exports", page_icon = 'uk',layout="wide")
 
 #--------------------------------------------------------------------
 
