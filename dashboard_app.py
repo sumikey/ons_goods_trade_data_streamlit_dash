@@ -85,7 +85,7 @@ open_file.close()
 ### SET INTO WIDE MODE
 ### set page config must be called as first streamlit command
 
-# setting the page to open in wide mode
+# setting the page title, icon and opening in wide mode
 st.set_page_config(page_title = "UK Goods Exports", page_icon = 'uk',layout="wide")
 
 #--------------------------------------------------------------------
@@ -113,7 +113,7 @@ st.write("""
 
 #intro
 st.write("""
-##### This dashboard is for analysing UK goods exports to different trading partners around the world. The first section looks at the UK's overall goods exports to a chosen trade partner. The second section looks at overall UK exports to that same partner by SITC 1 digit product categories. The third section compares UK exports to a chosen partner and product to a range of other trading partners. The fourth section allow comparisons of exports of several different products to a single partner. In sections 3 and 4, products can be chosen across a range of SITC 1, 2 and 3 digit codes, as published by the ONS within this dataset. By default all charts are on a 12 month rolling sum basis, but the degree of rolling can be set in the sidebar and rolling can be set as "1" to explore only monthly values. Minimum and maximum date ranges for the charts can be set using the sliders in the sidebar. Side bar sliders control all the visuals at once.
+##### This dashboard is for analysing UK goods exports to different trading partners around the world. The first section looks at the UK's overall goods exports to a chosen trade partner. The second section looks at overall UK exports to that same partner by SITC 1 digit product categories. The third section compares UK exports to a chosen partner and product to a range of other trading partners. The fourth section allow comparisons of exports of several different products to a single partner. The fifth sections allows comparisons across (customisable groupings of trade partners). In sections 3 and 4, products can be chosen across a range of SITC 1, 2 and 3 digit codes, as published by the ONS within this dataset. By default all charts are on a 12 month rolling sum basis, but the degree of rolling can be set in the sidebar and rolling can be set as "1" to explore only monthly values. Minimum and maximum date ranges for the charts can be set using the sliders in the sidebar. Side bar sliders control all the visuals at once.
 
 ---
 """)
@@ -415,7 +415,7 @@ with colc3:
 
 #--------------------------------------------------------------------
 
-### SETTING UP THE FOURTH (AND FINAL) THREE PLOTS FOR COMPARING BY CHOSEN PRODUCT
+### SETTING UP THE FOURTH THREE PLOTS FOR COMPARING BY CHOSEN PRODUCT
 
 # write the title and intro for section 3
 st.write(
@@ -461,7 +461,7 @@ plot_compare_product_diff_df = plot_compare_product_df.diff(12).dropna().round(1
 plot_compare_product_percent_df = plot_compare_product_df.pct_change(12).mul(100).dropna().round(1).loc[min_year:max_year] # the % change yoy
 
 # create three separate columns
-colc1, colc2, colc3 = st.columns((1,1,1))
+cold1, cold2, cold3 = st.columns((1,1,1))
 
 # create a product string name for inserting into title
 # take the list of descriptions (without codes) add then together with an "and" for the last one
@@ -480,7 +480,7 @@ else:                                         # for when only one thing selected
     multiprod_title_string = str(mulprod_product_select[0])
 
 # plot a separate chart in each column
-with colc1: 
+with cold1: 
     # plot a line chart of monthly absolute values
     # handle titles depending on the rolling factor
     if rol_val > 1:
@@ -489,7 +489,7 @@ with colc1:
         st.write(f"UK exports to {mulprod_partner_select} of {multiprod_title_string}, monthly, £s millions")
     st.line_chart(plot_compare_product_abs_df)           #line chart
 
-with colc2: 
+with cold2: 
     # plot a line chart of gbp yoy change
     # handle titles depending on the rolling factor
     if rol_val > 1:
@@ -498,7 +498,7 @@ with colc2:
         st.write(f"UK exports to {mulprod_partner_select} of {multiprod_title_string}, £s millions change yoy")
     st.line_chart(plot_compare_product_diff_df)           #line chart
 
-with colc3:
+with cold3:
     # plot a line of monthly yoy % change
     # handle titles depending on the rolling factor
     if rol_val > 1:
@@ -510,6 +510,118 @@ with colc3:
     
 st.write('---')
     
+#--------------------------------------------------------------------
+
+### SETTING UP THE FIFTH THREE PLOTS FOR COMPARING A GROUP FOR A CHOSEN PRODUCT
+
+# write the title and intro for section 3
+st.write(
+f"""
+---  
+##### Analysing Custom Trade Partner Groups, for a chosen product.
+This section shows the UK's exports of the selected commodity to customisable groupings of trade partners. The charts show the absolute volume of exports, the yoy change in £s and the yoy change in % terms. The product category can be chosen using the customs slider. 
+Custom trade partner groupings can be made using the multi-select box, and each grouping can be given it's own custom name.
+The number of months over which to roll values can be changed, or turned off entirely, within the side bar.
+"""
+)
+
+# setup a list of codes + descriptions concatenated together from headers
+# will use this to construct a unique list
+# and then a dictionary so can use selection from this list to do the subsetting on desc header
+list_tuples_codeDesc_desc = [(header[1] +' : ' +header[2],   # tuple part one - code + description
+                              header[2])                    # tuple part 2 - description
+                             for header in df.columns]
+# use set to get the unique values, and make a list again
+list_set_tuples_codeDesc_desc = list(set(list_tuples_codeDesc_desc))
+
+# get list of codes concatentenated with descriptions for multi-selector
+# then sort it in ascending order
+codes_desc_list = [item[0] for item in list_set_tuples_codeDesc_desc]
+codes_desc_list.sort()
+
+# creating the dictionary which will use to get desc for codeDesc, to subset our headers
+dict_codeDesc_desc = {item[0]:item[1] for item in list_set_tuples_codeDesc_desc}
+
+# create a selectbox for choosing commodity to look at comparison chart for
+group_product_select_codeDesc = st.selectbox('Select a product to compare across partner groupings', codes_desc_list, index= codes_desc_list.index('T : Total'))
+
+# convert this to a description only which we can use to subset headers, using our dict
+group_product_select = dict_codeDesc_desc[group_product_select_codeDesc]
+
+cole1, cole2, cole3 = st.columns((1,1,1))
+
+with cole1:
+    group1_partners = st.multiselect('Select trade partners to include in Group 1', partner_list, default=['China', 'Hong Kong', 'Macao'])
+    group1_name = st.text_input('Give your first group a custom name (optional)',value='Group 1')
+
+with cole2:
+    group2_partners = st.multiselect('Select trade partners to include in Group 2', partner_list, default=['United States inc Puerto Rico', 'Canada'])
+    group2_name = st.text_input('Give your second group a custom name (optional)',value='Group 2')
+    
+with cole3:
+    group3_partners = st.multiselect('Select trade partners to include in Group 3', partner_list, default=['Germany', 'France','Italy','Netherlands'])
+    group3_name = st.text_input('Give your third group a custom name (optional)',value='Group 3')
+
+# index our dataframe using our selections
+# need to transpose once and then back again.
+# use colons (:) to pick all instances for code and flow index
+# sum these to get aggregates for each of our groups
+idx = pd.IndexSlice
+group1_series = df.T.loc[idx[group1_partners,:,group_product_select,:] ,:].sum()
+group2_series = df.T.loc[idx[group2_partners,:,group_product_select,:] ,:].sum()
+group3_series = df.T.loc[idx[group3_partners,:,group_product_select,:] ,:].sum()
+
+# turn these three series into a dataframe
+group_df = group1_series.to_frame()
+group_df['col2'] = group2_series
+group_df['col3'] = group3_series
+
+# and use our custom names to rename columns
+group_df.columns = [group1_name, group2_name, group3_name]
+
+# add the rolling factor to our plotting df
+group_df = group_df.rolling(rol_val).sum().dropna() # edit the plotting df accordingly
+
+plot_group_abs_df = group_df.round(1).loc[min_year:max_year] # for plotting absolute values
+plot_group_diff_df = group_df.diff(12).dropna().round(1).loc[min_year:max_year] # for plotting absolute values
+plot_group_percent_df = group_df.pct_change(12).mul(100).dropna().round(1).loc[min_year:max_year] # the % change yoy
+
+# create three separate columns
+colf1, colf2, colf3 = st.columns((1,1,1))
+
+# plot a separate chart in each column
+with colf1: 
+    # plot a line chart of monthly absolute values
+    # handle titles depending on the rolling factor
+    if rol_val > 1:
+        st.write(f"UK {product_select} exports to chosen groupings, rolling {str(rol_val)}M sum, £s millions") #title
+    else:
+        st.write(f"UK {product_select} exports to chosen groupings, monthly, £s millions")
+    st.line_chart(plot_group_abs_df)           #line chart
+
+with colf2: 
+    # plot a line chart of gbp yoy change
+    # handle titles depending on the rolling factor
+    if rol_val > 1:
+        st.write(f"UK {product_select} exports to chosen groupings, rolling {str(rol_val)}M sum, £s millions change yoy") #title
+    else:
+        st.write(f"UK {product_select} exports to chosen groupings, £s millions change yoy")
+    st.line_chart(plot_group_diff_df)           #line chart
+
+with colf3:
+    # plot a line of monthly yoy % change
+    # handle titles depending on the rolling factor
+    if rol_val > 1:
+        st.write(f"UK {product_select} exports to chosen groupings, rolling {str(rol_val)}M sum, % change yoy") #title
+    else:
+        st.write(f"UK {product_select} exports to chosen groupings, monthly, % change yoy")
+    st.line_chart(plot_group_percent_df)
+
+st.write('---')
+
+    
+    
 #ENDS#
+
 
 
